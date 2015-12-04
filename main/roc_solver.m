@@ -333,7 +333,7 @@ fprintf('Fitting the %s model to the data...',upper(model))
 
 % Use fmincon to find the best fitting model parameters
 tic;
-[bf_pars,min_val,exitflag,output] = ...
+[bf_pars,min_val,exitflag,output,lambda,grad,hessian] = ...
     fmincon(modelf,x0,[],[],[],[],LB,UB,constrfun,options);
 solve_time = toc;
 
@@ -463,6 +463,9 @@ data.(modelField)(index).optimization_info.solve_time = solve_time;
 data.(modelField)(index).optimization_info.fmincon_options = options;
 data.(modelField)(index).optimization_info.exitflag = exitflag;
 data.(modelField)(index).optimization_info.messages = output;
+data.(modelField)(index).optimization_info.lambda = lambda;
+data.(modelField)(index).optimization_info.grad = grad;
+data.(modelField)(index).optimization_info.hessian = hessian;
 fprintf('DONE\n')
 
 % Plot summary figure if requested
