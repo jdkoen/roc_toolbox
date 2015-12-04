@@ -90,6 +90,8 @@ rocData = roc_solver(targf,luref,model,fitStat,x0,LB,UB, ...
     'saveFig',outpath);
 
 %% Run a different variant of the EVSD model (make Vo = 1), and store with the UVSD model above
+evsdParNames = {'Dprime'};
+
 % First, generate the x0, LB, and UB vectors again, using the evsdParNames
 [x0,LB,UB] = gen_pars(model,nBins,nConds,evsdParNames);
 
