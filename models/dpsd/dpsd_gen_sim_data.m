@@ -96,8 +96,10 @@ if nargin < 4
 end
 
 % Seed rng with rngSeed
-if exist(rngSeed,'var') && ~isempty(rngSeed,'var')
-    rng(rngSeed);
+if exist('rngSeed','var') 
+    if ~isempty(rngSeed)
+        rng(rngSeed);
+    end
 end
 
 % If ignoreConds doesn't exist, set it as empty
