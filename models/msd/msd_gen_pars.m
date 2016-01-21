@@ -243,28 +243,6 @@ else
     uvar1_lure=1;
 end
 
-% Set values for the Dprime2_lure parameter
-if ismember('Dprime2_lure',parNames)
-    Dprime2_lure=1;
-    lDprime2_lure=-Inf;
-    uDprime2_lure=Inf;
-else
-    Dprime2_lure=0;
-    lDprime2_lure=0;
-    uDprime2_lure=0;
-end
-
-% Set values for the var2_lure paramter
-if ismember('var2_lure',parNames)
-    var2_lure=1;
-    lvar2_lure=0;
-    uvar2_lure=Inf;
-else
-    var2_lure=1;
-    lvar2_lure=1;
-    uvar2_lure=1;
-end
-
 % Calculate criterion parameters
 criterion=[-1.5 ones(1,nBins-2)*(3/(nBins-2))];
 lcriterion=[-Inf zeros(1,nBins-2)];
@@ -278,14 +256,11 @@ UB=zeros(nConds,10+length(criterion));
 % Create output vectors
 for a=1:nConds
     x0(a,:)=[lambda_targ Dprime1_targ var1_targ Dprime2_targ var2_targ ...
-        lambda_lure Dprime1_lure var1_lure Dprime2_lure var2_lure ...
-        criterion];
+        lambda_lure Dprime1_lure var1_lure criterion];
     LB(a,:)=[llambda_targ lDprime1_targ lvar1_targ lDprime2_targ lvar2_targ ...
-             llambda_lure lDprime1_lure lvar1_lure lDprime2_lure lvar2_lure ...
-             lcriterion];
+             llambda_lure lDprime1_lure lvar1_lure lcriterion];
     UB(a,:)=[ulambda_targ uDprime1_targ uvar1_targ uDprime2_targ uvar2_targ ...
-             ulambda_lure uDprime1_lure uvar1_lure uDprime2_lure uvar2_lure ...
-             ucriterion];
+             ulambda_lure uDprime1_lure uvar1_lure ucriterion];
 end
 
 end

@@ -70,7 +70,7 @@ function outInfo = msd_info(type)
 
 % Define the information for the dpsd model
 parNames = {'lambda_targ' 'Dprime1_targ' 'var1_targ' 'Dprime2_targ' 'var2_targ', ...
-    'lambda_lure' 'Dprime1_lure' 'var1_lure' 'Dprime2_lure' 'var2_lure'};
+    'lambda_lure' 'Dprime1_lure' 'var1_lure'};
 nPars = length(parNames);
 field = 'msd_model';
 

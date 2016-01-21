@@ -122,9 +122,7 @@ var2_targ = pars(:,5);
 lambda_lure = pars(:,6);
 Dprime1_lure = pars(:,7);
 var1_lure = pars(:,8);
-Dprime2_lure = pars(:,9);
-var2_lure = pars(:,10);
-crit = [cumsum(pars(:,11:end),2) inf(size(pars,1),1)];
+crit = [cumsum(pars(:,9:end),2) inf(size(pars,1),1)];
 
 % Specify number of conditions and response bins.
 nconds = size(pars,1);
@@ -144,7 +142,7 @@ end
 % Here are the cell column IDs for reference. 
 % temp_targ & temp_lure:
 % 1 = Dprime1/var1 strength
-% 2 = Dprime2/var2 strength
+% 2 = Dprime2/var2 strength (temp_targ only)
 % 3 - Distribution Selector (1 in Dprime1 distro, 0 in Dprime2 distro)
 % 4 - Selected strength parameter
 
@@ -162,11 +160,11 @@ for samp = 1:nSamples
         
         % Determine Dprime1/var1 lure strength values
         temp_lure{a}(:,1) = ...
-            norminv(rand(nLure(a),1),(Dprime1_lure(a)+Dprime2_lure(a)),var1_lure(a));
+            norminv(rand(nLure(a),1),Dprime1_lure(a),var1_lure(a));
         
         % Determine Dprime2/var2 lure strength values
         temp_lure{a}(:,2) = ...
-            norminv(rand(nLure(a),1),Dprime2_lure(a),var2_lure(a));
+            norminv(rand(nLure(a),1),0,1);
         
         % Determine distribution selector for targets and lures
         temp_targ{a}(:,3) = (rand(nTarg(a),1) > 1-lambda_targ(a));

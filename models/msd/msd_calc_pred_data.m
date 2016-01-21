@@ -92,9 +92,7 @@ var2_targ = pars(:,5);
 lambda_lure = pars(:,6);
 Dprime1_lure = pars(:,7);
 var1_lure = pars(:,8);
-Dprime2_lure = pars(:,9);
-var2_lure = pars(:,10);
-crit = cumsum(pars(:,11:end),2);
+crit = cumsum(pars(:,9:end),2);
 
 % If roc wanted, overwrite the crit variable
 if strcmpi(output,'roc')
@@ -115,8 +113,8 @@ for b=1:size(pars,1)
         
         % Calculate predicted lures
         plurec(b,c) = ...
-            (lambda_lure(b) * normcdf(crit(b,c),(Dprime1_lure(b)+Dprime2_lure(b)),var1_lure(b))) + ...
-            ((1-lambda_lure(b)) * normcdf(crit(b,c),Dprime2_lure(b),var2_lure(b)));
+            (lambda_lure(b) * normcdf(crit(b,c),Dprime1_lure(b),var1_lure(b))) + ...
+            ((1-lambda_lure(b)) * normcdf(crit(b,c),0,1));
     
     end
 end
