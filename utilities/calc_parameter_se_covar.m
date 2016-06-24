@@ -118,10 +118,10 @@ for i = 1:length(theta)
         
         % Do the math in a piecewise fasion for each cell in C on the
         % positive value of the log-likelihood function
-        eq1 = -1*calc_model_fit('-LL',model,vec1,targf,luref,[]);
-        eq2 = -1*calc_model_fit('-LL',model,vec2,targf,luref,[]);
-        eq3 = -1*calc_model_fit('-LL',model,vec3,targf,luref,[]);
-        eq4 = -1*calc_model_fit('-LL',model,vec4,targf,luref,[]);
+        eq1 = calc_model_fit('-LL',model,vec1,targf,luref,[]);
+        eq2 = calc_model_fit('-LL',model,vec2,targf,luref,[]);
+        eq3 = calc_model_fit('-LL',model,vec3,targf,luref,[]);
+        eq4 = calc_model_fit('-LL',model,vec4,targf,luref,[]);
         
         % Calculate C(i,j)
         C(i,j) = eq1 - eq2 - eq3 + eq4;

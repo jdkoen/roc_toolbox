@@ -474,7 +474,12 @@ parSE = calc_parameter_se_covar(data,model,index);
 % Store estimated hessian and other parameters from calc_hessian
 data.(modelField)(index).calc_hessian_output = parSE;
 for i = 1:length(parNames)
-    data.(modelField)(index).parSE.(parNames{i}) = parSE.parSE(:,i);
+    mask = strcmpi(parNames{i},parSE.parNames);    
+    if any(mask)        
+        data.(modelField)(index).parSE.(parNames{i}) = parSE.parSE(:,mask);
+    else
+        data.(modelFile)(index).parSE.(parNames{i}) = NaN;
+    end
 end
 data.(modelField)(index).parSE.criterion = ...
     parSE.parSE(length(parNames)+1:end); 
