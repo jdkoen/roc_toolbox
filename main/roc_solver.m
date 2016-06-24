@@ -424,6 +424,7 @@ data.(modelField)(index).fit_statistics.sst = ...
     data.(modelField)(index).fit_statistics.sst,nObs,nPars-nConstr);
 
 % Estimate SE of parameters from HEssian matrix
+parSE = sqrt(diag(inv(-1*hessian))); % Do the necessary math for MLE of negative log-liklihood
 parSE = reshape(parSE,nConds,length(parNames)+nBins-1); % Reshape the matrix into a better format
 
 % Best fitting model parameters
