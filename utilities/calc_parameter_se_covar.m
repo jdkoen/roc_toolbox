@@ -1,8 +1,8 @@
-function outData = calc_hessian(data,model,index,varargin)
+function outData = calc_parameter_se_covar(data,model,index,varargin)
 % Usage:
-%   outData = calc_hessian(data,model,index,varargin)
+%   outData = calc_parameter_se_covar(data,model,index,varargin)
 %
-% CALC_HESSIAN_MATRIX returns the hessian matrix, covariance matrix, and
+% CALC_PARAMETER_SE_COVAR returns the hessian matrix, covariance matrix, and
 % correlation matrix, for the parameters of the specified model that were
 % fit to the data (including criterion parameters). Thus, parameters that
 % were not allowed to vary in the model fitting routine (e.g., parameters
@@ -94,6 +94,12 @@ model_field = model_info(model,'field');
 nPars = model_info(model,'nPars');
 bf_pars = data.(model_field)(index).optimization_info.bf_pars;
 
+% Based on the model, select the non-criterion parameters that were
+% estimated.
+fitPars = ...
+    data.(model_field)(index).optimization_info.lower_bounds ~= ...
+    data.(model_field)(index).optimization_info.upper_bounds;    
+
 % Convert bf_pars to theta vector. This will be re-shaped later.
 theta = bf_pars(:)';
 
@@ -110,11 +116,12 @@ for i = 1:length(theta)
         vec3 = reshape(theta - e(i,:) + e(j,:),size(bf_pars));
         vec4 = reshape(theta - e(i,:) - e(j,:),size(bf_pars));
         
-        % Do the math in a piecewise fasion for each cell in C
-        eq1 = calc_model_fit('-LL',model,vec1,targf,luref,[]);
-        eq2 = calc_model_fit('-LL',model,vec2,targf,luref,[]);
-        eq3 = calc_model_fit('-LL',model,vec3,targf,luref,[]);
-        eq4 = calc_model_fit('-LL',model,vec4,targf,luref,[]);
+        % Do the math in a piecewise fasion for each cell in C on the
+        % positive value of the log-likelihood function
+        eq1 = -1*calc_model_fit('-LL',model,vec1,targf,luref,[]);
+        eq2 = -1*calc_model_fit('-LL',model,vec2,targf,luref,[]);
+        eq3 = -1*calc_model_fit('-LL',model,vec3,targf,luref,[]);
+        eq4 = -1*calc_model_fit('-LL',model,vec4,targf,luref,[]);
         
         % Calculate C(i,j)
         C(i,j) = eq1 - eq2 - eq3 + eq4;
@@ -124,6 +131,7 @@ end
 
 % Finish off hessian matrix calculation and select the fitted pars.
 hessMat = C ./ (4 .* (delta .^ 2));
+hessMat = hessMat(fitPars,fitPars);
 
 % Calculate covarMat using the left divide notation (not INV due to issues
 % reported online).  
@@ -137,9 +145,10 @@ parSE = sqrt(diag(covarMat))';
 
 % Get the parNames variable
 parNames = model_info(model,'parNames');
-for i = (size(targf,2)-1):-1:1
+for i = (length(fitPars)-nPars):-1:1
     parNames = [parNames strcat('c',num2str(i))];
 end
+parNames = parNames(fitPars);
 
 % Make the output
 outData.parNames = parNames;
