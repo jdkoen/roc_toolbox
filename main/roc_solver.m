@@ -423,13 +423,19 @@ data.(modelField)(index).fit_statistics.sst = ...
     calc_r_squared(data.(modelField)(index).fit_statistics.sse, ...
     data.(modelField)(index).fit_statistics.sst,nObs,nPars-nConstr);
 
+% Estimate SE of parameters from HEssian matrix
+parSE = reshape(parSE,nConds,length(parNames)+nBins-1); % Reshape the matrix into a better format
+
 % Best fitting model parameters
 parNames = model_info(model,'parNames');
 for i = 1:length(parNames)
     data.(modelField)(index).parameters.(parNames{i}) = bf_pars(:,i);
+    data.(modelField)(index).parSE.(parNames{i}) = parSE(:,i);
 end
 data.(modelField)(index).parameters.criterion = ...
     cumsum(bf_pars(:,length(parNames)+1:end),2);
+data.(modelField)(index).parSE.criterion = ...
+    parSE(:,length(parNames)+1:end);
 
 % Update specific model parameter estimates
 if strcmpi(model,'msd')
