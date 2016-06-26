@@ -80,8 +80,8 @@ function predData = msd_calc_pred_data(pars,nTarg,nLure,output)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Preallocate variables
-ptargc = ones(size(pars,1),size(pars,2)-9);
-plurec = ones(size(pars,1),size(pars,2)-9);
+ptargc = ones(size(pars,1),size(pars,2)-8);
+plurec = ones(size(pars,1),size(pars,2)-8);
 
 % Assign parameter variables
 lambda_targ = pars(:,1);
