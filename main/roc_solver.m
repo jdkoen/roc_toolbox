@@ -157,7 +157,7 @@ function data = roc_solver(targf,luref,model,fitStat,x0,LB,UB,varargin)
 %   present, then the function skips (re)creating that output. If a
 %   different version of the model is being fit to the data (i.e., a
 %   version of the model with a new constraint), then the field containing
-%   thte models output becomes a structured array. 
+%   the models output becomes a structured array. 
 %
 % Authored by: Joshua Koen
 
@@ -331,7 +331,8 @@ modelf = @(pars) calc_model_fit(fitStat,model,pars,targf,luref,ignoreConds);
 %Print start information to screen
 fprintf('Fitting the %s model to the data...',upper(model))
 
-% Use fmincon to find the best fitting model parameters
+% Use fmincon to find the best fitting model parameters and bootstrap
+% estimate standard errors
 tic;
 [bf_pars,min_val,exitflag,output,lambda,grad,hessian] = ...
     fmincon(modelf,x0,[],[],[],[],LB,UB,constrfun,options);
@@ -423,13 +424,24 @@ data.(modelField)(index).fit_statistics.sst = ...
     calc_r_squared(data.(modelField)(index).fit_statistics.sse, ...
     data.(modelField)(index).fit_statistics.sst,nObs,nPars-nConstr);
 
+% Compute standard error of the parameter estimates (remove bounded
+% constraints)
+fitPars = LB ~= UB;
+nanVec = nan(size(fitPars(:)));
+hess = hessian(fitPars,fitPars);
+parSE = diag(sqrt(inv(hess)));
+nanVec(fitPars(:)) = parSE;
+parSE = reshape(nanVec,size(fitPars));
+
 % Best fitting model parameters
 parNames = model_info(model,'parNames');
 for i = 1:length(parNames)
     data.(modelField)(index).parameters.(parNames{i}) = bf_pars(:,i);
+    data.(modelField)(index).parSE.(parNames{i}) = parSE(:,i);
 end
 data.(modelField)(index).parameters.criterion = ...
     cumsum(bf_pars(:,length(parNames)+1:end),2);
+data.(modelField)(index).parSE.criterion = parSE(:,length(parNames)+1:end);
 
 % Update specific model parameter estimates
 if strcmpi(model,'msd')
@@ -465,24 +477,8 @@ data.(modelField)(index).optimization_info.exitflag = exitflag;
 data.(modelField)(index).optimization_info.messages = output;
 data.(modelField)(index).optimization_info.lambda = lambda;
 data.(modelField)(index).optimization_info.grad = grad;
-data.(modelField)(index).optimization_info.fmincon_hessian = hessian;
+data.(modelField)(index).optimization_info.hessian = hessian;
 fprintf('DONE\n')
-
-% Calc Hessian matrix to get parameter SE
-parSE = calc_parameter_se_covar(data,model,index);
-
-% Store estimated hessian and other parameters from calc_hessian
-data.(modelField)(index).calc_hessian_output = parSE;
-for i = 1:length(parNames)
-    mask = strcmpi(parNames{i},parSE.parNames);    
-    if any(mask)        
-        data.(modelField)(index).parSE.(parNames{i}) = parSE.parSE(:,mask);
-    else
-        data.(modelFile)(index).parSE.(parNames{i}) = NaN;
-    end
-end
-data.(modelField)(index).parSE.criterion = ...
-    parSE.parSE(length(parNames)+1:end); 
 
 % Plot summary figure if requested
 if figure || ~isempty(outpath)
