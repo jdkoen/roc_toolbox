@@ -128,6 +128,14 @@ function data = roc_solver(targf,luref,model,fitStat,x0,LB,UB,varargin)
 %   statistic calculation, use this option with ignoreConds = 2. Supplying
 %   this option calls the CRITERIA_CONSTRAINT function.
 %
+%   ('bootIter',bootIter) - This is a scalar value. The first value
+%   that specifies the number of non-parameteric bootstrap iterations to
+%   use to estimate the standard error of the parameter estimates. This can
+%   be a time consuming process, particularly when model complexity
+%   increases. For this reason the ROC_SOLVER function does not estimate
+%   the SE of the parameter estimates by default. This option 
+%   calls the BOOTSTRAP_FREQS function. 
+%
 %   ('constrfun',@constrfun) - This is a function handle input for a 
 %   non-linear parameter constraint function that will be supplied to the
 %   FMINCON function. The input must be a function handle or you will get 
@@ -236,6 +244,7 @@ figure = true;
 outpath = '';
 figTimeout = [];
 ignoreConds = [];
+bootIter = 0;
 constrfun = '';
 options = optimset('fmincon');
 options.TolX = 1e-8;
@@ -270,6 +279,8 @@ for k = 1:2:nargin-7
             figTimeout = varargin{k+1};
         case 'ignoreConds'
             ignoreConds = varargin{k+1};
+        case 'bootIter'
+            bootIter = varargin{k+1};
         case 'constrfun'
             constrfun = varargin{k+1};
         case 'options'
@@ -312,6 +323,7 @@ end
 
 % Summarize some information about the model design, number of trials, and
 % the field name to write the optimized output.
+parNames = model_info(model,'parNames');
 nConds = size(targf,1);
 nBins = size(targf,2);
 [nObs,nPars,df] = summarize_model(nConds,nBins,nConstr,x0,LB,UB,ignoreConds);
@@ -334,7 +346,7 @@ fprintf('Fitting the %s model to the data...',upper(model))
 % Use fmincon to find the best fitting model parameters and bootstrap
 % estimate standard errors
 tic;
-[bf_pars,min_val,exitflag,output,lambda,grad,hessian] = ...
+[bf_pars,min_val,exitflag,output] = ...
     fmincon(modelf,x0,[],[],[],[],LB,UB,constrfun,options);
 solve_time = toc;
 
@@ -356,6 +368,54 @@ else
     fprintf('Exitflag was not 0, 1, or 2. The exit flag was %d.', exitflag)    
     fprintf(['Check the optimization_info.messages field of \n' ... 
         ' the output for more information.'])
+end
+
+% Estimate SE of the Parameter Estimates
+if bootIter ~= 0 
+    
+    % Initialize variable for output
+    bootPars = zeros(nConds,size(x0,2),bootIter);
+    bootCount = 0;
+    
+    % Start a while loop to get booITer good samples
+    while true
+        
+        % Get bootstraped sample of targf and luref
+        bootData = bootstrap_freqs(targf,luref,ignoreConds);
+        
+        % Specify function handle to pass to fmincon
+        modelf = @(pars) calc_model_fit(fitStat,model,pars, ...
+            bootData.targf,bootData.luref,ignoreConds);
+        
+        % Estimate thje current bootstrap
+        [se_pars,se_min_val,se_exitflag,se_output] = ...
+            fmincon(modelf,x0,[],[],[],[],LB,UB,constrfun,options);
+        
+        % Check if there was a warning and if so, discard se_pars
+        if ~isempty(lastwarn)
+            lastwarn('');
+            continue;
+        end
+        
+        % Check if a bad exit flag and if so, discard se_pars
+        if ~ismember(se_exitflag,[0 1 2])
+            continue;
+        end 
+        
+        % Store in bootPars        
+        bootCount = bootCount + 1;
+        se_pars(:,length(parNames)+1:end) = ...
+            cumsum(se_pars(:,length(parNames)+1:end));
+        bootPars(:,:,bootCount) = se_pars;
+        fprintf('Bootstrap Iteration %04d\n',bootCount)
+        
+        % Exit when necessary
+        if bootCount == bootIter
+            break;
+        end
+        
+    end
+    
 end
 
 % Create structure variable output from model fit.
@@ -424,17 +484,13 @@ data.(modelField)(index).fit_statistics.sst = ...
     calc_r_squared(data.(modelField)(index).fit_statistics.sse, ...
     data.(modelField)(index).fit_statistics.sst,nObs,nPars-nConstr);
 
-% Compute standard error of the parameter estimates (remove bounded
-% constraints)
+% Compute standard error of the parameter estimates (set unestimated
+% parameters to NaN)
+parSE = std(bootPars,[],3);
 fitPars = LB ~= UB;
-nanVec = nan(size(fitPars(:)));
-hess = hessian(fitPars,fitPars);
-parSE = diag(sqrt(inv(hess)));
-nanVec(fitPars(:)) = parSE;
-parSE = reshape(nanVec,size(fitPars));
+parSE(~fitPars) = NaN;
 
 % Best fitting model parameters
-parNames = model_info(model,'parNames');
 for i = 1:length(parNames)
     data.(modelField)(index).parameters.(parNames{i}) = bf_pars(:,i);
     data.(modelField)(index).parSE.(parNames{i}) = parSE(:,i);
@@ -475,9 +531,11 @@ data.(modelField)(index).optimization_info.solve_time = solve_time;
 data.(modelField)(index).optimization_info.fmincon_options = options;
 data.(modelField)(index).optimization_info.exitflag = exitflag;
 data.(modelField)(index).optimization_info.messages = output;
-data.(modelField)(index).optimization_info.lambda = lambda;
-data.(modelField)(index).optimization_info.grad = grad;
-data.(modelField)(index).optimization_info.hessian = hessian;
+
+% Log bootstrap info and data
+data.(modelField)(index).bootstrap_parSE_est.bootIter = bootIter;
+data.(modelField)(index).bootstrap_parSE_est.bootPars = bootPars;
+
 fprintf('DONE\n')
 
 % Plot summary figure if requested

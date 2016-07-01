@@ -1,4 +1,4 @@
-function bootFreq = boostrap_freqs(targf,luref,ignoreConds,rngSeed)
+function bootFreq = bootstrap_freqs(targf,luref,ignoreConds,rngSeed)
 % Usage: 
 %   bootFreq = bootstrap_freqs(targf,luref)
 %
