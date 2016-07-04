@@ -416,6 +416,10 @@ if bootIter ~= 0
         
     end
     
+else
+    
+    bootPars = nan(size(bf_pars));
+    
 end
 
 % Create structure variable output from model fit.
