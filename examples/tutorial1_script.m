@@ -74,6 +74,10 @@ uvsdParNames = {'Dprime' 'Vo'}; % This defines the two parameters of the UVSD mo
 %% Use roc_solver to fit the UVSD model to the data, and store output in rocData
 rocData = roc_solver(targf,luref,model,fitStat,x0,LB,UB);
 
+%% Use roc_solver to fit the UVSD model and estimate the SE of the parameter estimates
+bootIter = 100;
+rocData = roc_solver(targf,luref,model,fitStat,x0,LB,UB,'bootIter',bootIter);
+
 %% Add some additional options to the roc_solver to show its flexibility, and run roc_solver again
 subID = 'tutorial1_subject'; % This is the subject ID
 groupID = 'group1'; % This can be used for a between-group ID

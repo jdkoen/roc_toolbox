@@ -373,6 +373,9 @@ end
 % Estimate SE of the Parameter Estimates
 if bootIter ~= 0 
     
+    % Enter a return for display purposes
+    fprintf('\n');
+    
     % Initialize variable for output
     bootPars = zeros(nConds,size(x0,2),bootIter);
     bootCount = 0;
