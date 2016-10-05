@@ -8,23 +8,23 @@ function roc_version
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % The ROC Toolbox is the proprietary property of The Regents of the       
-% University of California (ìThe Regents.î)                                
+% University of California (‚ÄúThe Regents.‚Äù)                                
 %
-% Copyright © 2014 The Regents of the University of California, Davis
+% Copyright ¬© 2014 The Regents of the University of California, Davis
 % campus. All Rights Reserved.   
 %
 % Redistribution and use in source and binary forms, with or without
 % modification, are permitted by nonprofit, research institutions for
 % research use only, provided that the following conditions are met:  
 %
-% ï	Redistributions of source code must retain the above copyright 
+% ‚Ä¢	Redistributions of source code must retain the above copyright 
 % notice, this list of conditions and the following disclaimer.  
 %
-% ï	Redistributions in binary form must reproduce the above copyright
+% ‚Ä¢	Redistributions in binary form must reproduce the above copyright
 % notice, this list of conditions and the following disclaimer in the
 % documentation and/or other materials provided with the distribution.   
 %
-% ï	The name of The Regents may not be used to endorse or promote 
+% ‚Ä¢	The name of The Regents may not be used to endorse or promote 
 % products derived from this software without specific prior written
 % permission.   
 %
@@ -54,7 +54,7 @@ function roc_version
 % copyright@ucdavis.edu. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-version = '1.1.1';
+version = '1.1.2';
 fprintf('ROC Toolbox v%s\n',version);
 
 end
