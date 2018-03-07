@@ -54,7 +54,7 @@ function roc_version
 % copyright@ucdavis.edu. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-version = '1.1.2';
+version = '1.1.3';
 fprintf('ROC Toolbox v%s\n',version);
 
 end
