@@ -511,7 +511,7 @@ if strcmpi(model,'msd')
     data.(modelField)(index).parameters.Dprime1_targ = ...
         bf_pars(:,2) + bf_pars(:,4);
     data.(modelField)(index).parameters.Dprime1_lure = ...
-        bf_pars(:,7) + bf_pars(:,9);
+        bf_pars(:,7);
 end
 
 % Generate the predicted and fitted data
