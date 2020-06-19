@@ -103,7 +103,7 @@ if exist('rngSeed','var')
 end
 
 % If ignoreConds doesn't exist, set it as empty
-if ~exist(ignoreConds,'var')
+if ~exist('ignoreConds','var')
     ignoreConds = [];
 end
 
