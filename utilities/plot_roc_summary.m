@@ -277,8 +277,12 @@ tpar_data = cell2mat(struct2cell(params)')';
 tpar_se = cell2mat(struct2cell(parSE)')';
 table_data = cell(size(tpar_data));
 for i = 1:numel(table_data)
-    table_data{i} = sprintf('%3.3f (%3.3f)',tpar_data(i),tpar_se(i));
-end       
+    if all(isnan(tpar_se))
+        table_data{i} = sprintf('%3.3f',tpar_data(i));
+    else
+        table_data{i} = sprintf('%3.3f (%3.3f)',tpar_data(i),tpar_se(i));
+    end
+end
     
 uitable('Data',table_data,'RowName',parLabels,...
     'ColumnName',cond_labels,....
