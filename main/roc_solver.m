@@ -128,13 +128,12 @@ function data = roc_solver(targf,luref,model,fitStat,x0,LB,UB,varargin)
 %   statistic calculation, use this option with ignoreConds = 2. Supplying
 %   this option calls the CRITERIA_CONSTRAINT function.
 %
-%   ('bootIter',bootIter) - This is a scalar value. The first value
-%   that specifies the number of non-parameteric bootstrap iterations to
-%   use to estimate the standard error of the parameter estimates. This can
-%   be a time consuming process, particularly when model complexity
-%   increases. For this reason the ROC_SOLVER function does not estimate
-%   the SE of the parameter estimates by default. This option 
-%   calls the BOOTSTRAP_FREQS function. 
+%   ('bootIter',bootIter) - This is a scalar value. The value specifies the 
+%   number of non-parameteric bootstrap iterations to use to estimate the
+%   standard error of the parameter estimates. This can be a time consuming
+%   process, particularly when model complexity increases. For this reason
+%   the ROC_SOLVER function does not estimate the SE of the parameter
+%   estimates by default. This option calls the BOOTSTRAP_FREQS function. 
 %
 %   ('constrfun',@constrfun) - This is a function handle input for a 
 %   non-linear parameter constraint function that will be supplied to the
@@ -156,6 +155,12 @@ function data = roc_solver(targf,luref,model,fitStat,x0,LB,UB,varargin)
 %       options.UseParallel = 'always';
 %       options.MaxFunEvals = 100000;
 %       options.MaxIter = 100000;
+%
+%   ('verbose',true/false) - This is a logical variable to print output to
+%   the screen. If true, the function will print information in the command
+%   window. If false, nothing is shown. Default is set to true. If the
+%   'bootIter' option is used with a value set to 0, verbose is set to be
+%   true. 
 %
 %   The only option that cannot be controlled is the algorithm, which is
 %   set to 'interior-point' by this function. 
@@ -253,6 +258,7 @@ options.Display = 'notify';
 options.UseParallel = 'always';
 options.MaxFunEvals = 100000;
 options.MaxIter = 100000;
+verbose = true;
 
 % Update defaults based on varargin
 for k = 1:2:nargin-7
@@ -284,15 +290,27 @@ for k = 1:2:nargin-7
         case 'constrfun'
             constrfun = varargin{k+1};
         case 'options'
-            options = varargin{k+1};        
+            options = varargin{k+1};
+        case 'verbose'
+            verbose = varargin{k+1};
         otherwise
             error('%s is an unrecognized input argument.',varargin{k})
     end
 end
 
+% Force verbose to be true if using bootIter
+if bootIter > 0
+    verbose = true;
+end
+
 % Force options.Algorithm to be 'interior-point'
 if ~strcmpi(options.Algorithm,'interior-point')    
    options.Algorithm = 'interior-point';
+end
+
+% If verbose = false, set options.Display to 'off'
+if ~verbose
+    options.Display = 'off';
 end
 
 % If a figure outpath is provided, make sure figure is set to true
@@ -341,7 +359,9 @@ end
 modelf = @(pars) calc_model_fit(fitStat,model,pars,targf,luref,ignoreConds);
 
 %Print start information to screen
-fprintf('Fitting the %s model to the data...',upper(model))
+if verbose
+    fprintf('Fitting the %s model to the data...',upper(model))
+end
 
 % Use fmincon to find the best fitting model parameters and bootstrap
 % estimate standard errors
@@ -352,16 +372,18 @@ solve_time = toc;
 
 % Return success, failure, or error from the fminsearchbnd function.
 if exitflag == 1 || exitflag ==2
-    fprintf('DONE\n')
-    if exitflag ==1
-        fprintf('Local minimum achieved and parameter constraints satisfied.')
-    else
-        fprintf('Local minimum is possible, and paramter constraints satisfied.')
-        fprintf('\nFMINCON stopped because the the change in all of the parameters')
-        fprintf('\nis less than options.TolX (%d).',options.TolX)
+    if verbose
+        fprintf('DONE\n')
+        if exitflag ==1
+            fprintf('Local minimum achieved and parameter constraints satisfied.')
+        else
+            fprintf('Local minimum is possible, and paramter constraints satisfied.')
+            fprintf('\nFMINCON stopped because the the change in all of the parameters')
+            fprintf('\nis less than options.TolX (%d).',options.TolX)
+        end
     end
 elseif exitflag == 0 
-    fprintf('FAILED\n')
+    fprintf('FAILED TO CONVERGE\n')
     fprintf('Check output for more information.')
 else
     fprintf('WARNING\n')
@@ -426,7 +448,9 @@ else
 end
 
 % Create structure variable output from model fit.
-fprintf('\nCreating output...')
+if verbose
+    fprintf('\nCreating output...')
+end
 
 % Assign subID, groupID, and condLabels
 data.subID = subID;
@@ -543,13 +567,17 @@ data.(modelField)(index).optimization_info.messages = output;
 data.(modelField)(index).bootstrap_parSE_est.bootIter = bootIter;
 data.(modelField)(index).bootstrap_parSE_est.bootPars = bootPars;
 
-fprintf('DONE\n')
+if verbose
+    fprintf('DONE\n')
+end
 
 % Plot summary figure if requested
 if figure || ~isempty(outpath)
     
     % Print summary figure
-    fprintf('Plotting summary figure...')
+    if verbose 
+        fprintf('Plotting summary figure...')
+    end
     f = plot_roc_summary(data,model,index,'outpath',outpath);
     
     % Hold script until figure is closed or timeout reached. If timeout
@@ -563,7 +591,9 @@ if figure || ~isempty(outpath)
     else
         uiwait(f.figure_handle)
     end
-    fprintf('DONE\n\n')
+    if verbose
+        fprintf('DONE\n\n')
+    end
 end
 
 end
