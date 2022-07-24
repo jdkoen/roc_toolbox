@@ -58,4 +58,4 @@ There are three tutorials provided with the toolbox:
 
 If you find the toolbox useful, please cite the following paper:
 
-Koen, J. D., Barrett, F. S., Harlow, I. M., & Yonelinas, A. P. (2017). The ROC Toolbox: A toolbox for analyzing receiver-operating characteristics derived from confidence ratings. Behavior Research Methods, 49(4), 1399–1406. (https://doi.org/10.3758/s13428-016-0796-z)
+Koen, J. D., Barrett, F. S., Harlow, I. M., & Yonelinas, A. P. (2017). The ROC Toolbox: A toolbox for analyzing receiver-operating characteristics derived from confidence ratings. Behavior Research Methods, 49(4), 1399–1406. https://doi.org/10.3758/s13428-016-0796-z
