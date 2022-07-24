@@ -16,10 +16,11 @@ These models can be fit to empirical data obtain parameter estimates for each mo
 Prerequisites & Included Redistributions:
 This toolbox has been developed in Matlab version 2011a and should be compatible with Matlab version 7.10.0.499 (R2009b) and up. You must have the Statistics and Optimization Toolboxes installed with Matlab for the ROC toolbox to function properly. 
 
-The ROC Toolbox includes two code redistributions under the GNU license. The redistributions included in this toolbox are from functions available on the Mathworks File Exchange: (1) loadtxt and sortcell, which can be found on the File Exchange. These functions are necessary for using the roc_import_data function.
+The ROC Toolbox includes two code redistributions under the GNU license. The redistributions included in this toolbox are from functions available on the Mathworks File Exchange: (1) [loadtxt](https://www.mathworks.com/matlabcentral/fileexchange/27962-loadtxt) and [sortcell](https://www.mathworks.com/matlabcentral/fileexchange/13770-sorting-a-cell-array), which can be found on the File Exchange. These functions are necessary for using the `roc_import_data` function.
 
 Getting the toolbox and adding it to the Matlab path
 1) Download a copy of the latest release of ROC Toolbox from:
+
 https://github.com/jdkoen/roc_toolbox/releases
 
 2) Unzip the .zip file to the target directory
@@ -36,14 +37,16 @@ roc_startup;
 These lines add the path to the ROC toolbox distribution to your Matlab environment, and runs a function named 'roc_startup.m' that will add the necessary directories to your path
 
 You can check to see if the ROC toolbox is in your path by running the following command
-	```matlab
-  which roc_solver
-  ```
+
+```matlab
+which roc_solver
+```
 
 To check the version of the ROC Toolbox you are using, run the following command
-	```matlab
-  roc_version;
-  ```
+
+```matlab
+roc_version;
+```
 
 ## Tutorials and Documentation
 
