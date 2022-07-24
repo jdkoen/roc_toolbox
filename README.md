@@ -1,5 +1,5 @@
-# roc_toolbox
-ROC Toolbox for Matlab
+
+# ROC Toolbox for Matlab
 
 ## Purpose
 
