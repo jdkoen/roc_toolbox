@@ -98,7 +98,7 @@ for a=1:size(targf,1)
         zroc=polyfit(cleaned_zscores.lure,cleaned_zscores.target,1);
 
         % Calculate Az
-        Az(a)=normcdf(zroc(2)/(sqrt(1+zroc(2)^2)));
+        Az(a)=normcdf(zroc(2)/(sqrt(1+zroc(1)^2)));
     end
 end
 
